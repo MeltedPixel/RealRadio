@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -33,6 +34,7 @@ public class Main extends Application {
         
         Scene rootScene = new Scene(root);
         
+        rootScene.setFill(Color.TRANSPARENT);
         mainStage.initStyle(StageStyle.TRANSPARENT);
         mainStage.setScene(rootScene);
         mainStage.show();
@@ -41,6 +43,8 @@ public class Main extends Application {
         mainStage.getIcons().add(new Image("io/whiskey/realradio/images/logoheadset.png"));
         
         contentStage = mainStage;
+        
+        root.requestFocus();
         
         rootScene.setOnMousePressed((MouseEvent event) -> {
             xOffset = event.getSceneX();
