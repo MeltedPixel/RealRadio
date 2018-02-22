@@ -5,6 +5,7 @@
  */
 package io.whiskey.realradio;
 
+import static io.whiskey.realradio.Main.contentStage;
 import static io.whiskey.realradio.Main.isDebugRunning;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +19,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
@@ -28,52 +28,57 @@ import javazoom.jl.player.Player;
  * @author MPHI14
  */
 public class ContentController implements Initializable {
-    
+
     @FXML
-    private Label label;
+    private Label label_leftLCD;
+
+    @FXML
+    private Label label_rightLCD;
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        setLeftLCD("121.90");
+        setRightLCD("000.00");
+    }  
     
     @FXML
     private void handleButtonAction(ActionEvent event) throws MalformedURLException, IOException, JavaLayerException {
-
-        Thread t1 = new Thread("Audio Thread");
-
-        if (t1.isAlive()) {
-            System.out.format("%s is alive.%n", t1.getName());
-        } else {
-            System.out.format("%s is not alive.%n", t1.getName());
-            
-            InputStream input = null;
-            try {
-                input = new URL("http://d.liveatc.net/kpdx2").openStream();
-                Player player = new Player(input);
-                player.play();
-
-                Platform.runLater(() -> {
-
-                });
-            } catch (MalformedURLException ex) {
-                Logger.getLogger(ContentController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException | JavaLayerException ex) {
-                Logger.getLogger(ContentController.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    input.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(ContentController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } 
+        startAudioStream("http://d.liveatc.net/kpdx2");
+    }
+    
+    // Button Minimize
+    @FXML
+    private void buttonActionMinimize(ActionEvent event) {
+        // Debug Statement
+        if (isDebugRunning) {
+            System.out.println("Debug: " + "Application Minimized");
         }
-        t1.start();
-        
-        
-        /*
+
+        // Set the State of the PrimaryStage to Minimized (Iconified)
+        contentStage.setIconified(true);
+    }
+
+    // Button Close
+    @FXML
+    private void buttonActionClose(ActionEvent event) {
+        // Debug Statement
+        if (isDebugRunning) {
+            System.out.println("Debug: " + "Application Closed");
+        }
+
+        // Close the Application
+        System.exit(0);
+
+    }
+
+    public void startAudioStream(String audioUrl) {
         Thread audioThread = new Thread() {
             
             @Override
             public void run() {
                 InputStream input = null;
                 try {
-                    input = new URL("http://d.liveatc.net/kpdx2").openStream();
+                    input = new URL(audioUrl).openStream();
                     Player player = new Player(input);
                     player.play();
                     
@@ -94,11 +99,23 @@ public class ContentController implements Initializable {
             }
         };
         audioThread.start();
-        */
+    }
+
+    public Label getLeftLCD() {
+        return label_leftLCD;
+    }
+
+    public void setLeftLCD(String frequency) {
+        this.label_leftLCD.setText(frequency);
+    }
+
+    public Label getRightLCD() {
+        return label_rightLCD;
+    }
+
+    public void setRightLCD(String frequency) {
+        this.label_rightLCD.setText(frequency);
     }
     
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        
-    }   
+    
 }
