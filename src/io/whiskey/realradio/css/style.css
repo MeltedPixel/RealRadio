@@ -29,3 +29,10 @@
     -fx-border-color: #567fa8;
     -fx-border-style: hidden solid hidden hidden;
 }
+
+.custombutton{
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+}
