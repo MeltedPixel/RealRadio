@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javafx.event.ActionEvent;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javazoom.jl.decoder.JavaLayerException;
@@ -21,11 +26,14 @@ import javazoom.jl.decoder.JavaLayerException;
  * @author MPHI14
  */
 public class RealRadio extends javax.swing.JFrame {
-    private static Thread audioThread = null;
-    private static final String currentStream = "http://d.liveatc.net/kpdx2";
+    private static Thread audioThreadCom1 = null;
+    private static final String com1AudioStream = "http://d.liveatc.net/kpdx2";
     private static String com1ActiveFreq;
+    private static String com2ActiveFreq;
     private static String com1StandbyFreq;
+    private static String com2StandbyFreq;
     private static String com1LightState;
+    private static String com2LightState;
     private static Boolean isBatteryOn;
     private static String batteryState;
     private static int refreshTime = 1000;
@@ -66,7 +74,11 @@ public class RealRadio extends javax.swing.JFrame {
         RealRadio = new javax.swing.JLabel();
         lbl_standbyFreq = new javax.swing.JLabel();
         lbl_activeFreq = new javax.swing.JLabel();
+        lbl_standbyFreq1 = new javax.swing.JLabel();
+        lbl_activeFreq1 = new javax.swing.JLabel();
+        vhf2_light = new javax.swing.JLabel();
         vhf1_light = new javax.swing.JLabel();
+        lbl_connectionStatus = new javax.swing.JLabel();
         updaterBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -131,11 +143,32 @@ public class RealRadio extends javax.swing.JFrame {
         lbl_activeFreq.setText("112.80");
         getContentPane().add(lbl_activeFreq, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 57, 110, 30));
 
+        lbl_standbyFreq1.setFont(new java.awt.Font("Digital-7", 0, 30)); // NOI18N
+        lbl_standbyFreq1.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_standbyFreq1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbl_standbyFreq1.setText("112.80");
+        getContentPane().add(lbl_standbyFreq1, new org.netbeans.lib.awtextra.AbsoluteConstraints(238, 230, 110, 30));
+
+        lbl_activeFreq1.setFont(new java.awt.Font("Digital-7", 0, 30)); // NOI18N
+        lbl_activeFreq1.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_activeFreq1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbl_activeFreq1.setText("112.80");
+        getContentPane().add(lbl_activeFreq1, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 230, 110, 30));
+
+        vhf2_light.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/whiskey/realradio/images/light.png"))); // NOI18N
+        getContentPane().add(vhf2_light, new org.netbeans.lib.awtextra.AbsoluteConstraints(157, 118, -1, -1));
+
         vhf1_light.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/whiskey/realradio/images/light.png"))); // NOI18N
         getContentPane().add(vhf1_light, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 118, -1, -1));
 
+        lbl_connectionStatus.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
+        lbl_connectionStatus.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_connectionStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbl_connectionStatus.setText("Not Connected");
+        getContentPane().add(lbl_connectionStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 351, 100, -1));
+
         updaterBackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/io/whiskey/realradio/images/uiskin.png"))); // NOI18N
-        getContentPane().add(updaterBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 404, 198));
+        getContentPane().add(updaterBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 404, 385));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -150,41 +183,28 @@ public class RealRadio extends javax.swing.JFrame {
 
     private void audioTestButton(ActionEvent event) throws MalformedURLException, IOException, JavaLayerException {
         
-        if (audioThread == null) {
-            // Debug Statement
-            if (isDebugRunning) {
-                System.out.println("Debug: " + "Audio Thread is Null - Probably first boot.");
-            }
-            audioThread = new AudioStream(currentStream);
-            audioThread.start();
-            
-        } else {
-            if (audioThread.isAlive()) {
-                // Debug Statement
-                if (isDebugRunning) {
-                    System.out.println("Debug: " + "Audio Thread is Alive - Can't start another thread!");
-                }
-            } else {
-                // Debug Statement
-                if (isDebugRunning) {
-                    System.out.println("Debug: " + "Audio Thread not started");
-                }
-                audioThread = new AudioStream(currentStream);
-                audioThread.start();
-                
-            }
-        }
     }
     
-    private static void stopAudioStream() {
-        if (audioThread == null) {
+    private static void stopAudioStreamCom1() {
+        if (audioThreadCom1 == null) {
             // Debug Statement
             if (isDebugRunning) {
                 System.out.println("Debug: " + "Can't stop a Null Thread");
             }
         } else {
             
-            audioThread.interrupt();
+            audioThreadCom1.interrupt();
+
+            if (audioThreadCom1.isAlive()) {
+                try {
+                    Clip audioSuccess = AudioSystem.getClip();
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(RealRadio.class.getResource("sounds/LeaveChannel.wav"));
+                    audioSuccess.open(inputStream);
+                    audioSuccess.start();
+                } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+                    System.err.println(e.getMessage());
+                }
+            }
 
         }
     }
@@ -195,60 +215,80 @@ public class RealRadio extends javax.swing.JFrame {
             @Override
             public void run() {
                 try (XPlaneConnect xpc = new XPlaneConnect()) {
+
                     while(true) {
 
                         String com1ActiveDref = "sim/cockpit/radios/com1_freq_hz";
+                        String com2ActiveDref = "sim/cockpit/radios/com2_freq_hz";
                         String com1StandbyDref = "sim/cockpit/radios/com1_stdby_freq_hz";
+                        String com2StandbyDref = "sim/cockpit/radios/com2_stdby_freq_hz";
                         String batteryPowerDref = "sim/cockpit/electrical/battery_on";
                         String com1ListenDref = "sim/cockpit2/radios/actuators/audio_selection_com1";
+                        String com2ListenDref = "sim/cockpit2/radios/actuators/audio_selection_com2";
 
                         float[] com1ActiveDrefResult = xpc.getDREF(com1ActiveDref);
+                        float[] com2ActiveDrefResult = xpc.getDREF(com2ActiveDref);
                         float[] com1StandbyDrefResult = xpc.getDREF(com1StandbyDref);
+                        float[] com2StandbyDrefResult = xpc.getDREF(com2StandbyDref);
                         float[] com1ListenDrefResult = xpc.getDREF(com1ListenDref);
+                        float[] com2ListenDrefResult = xpc.getDREF(com2ListenDref);
                         float[] batteryPowerDrefResult = xpc.getDREF(batteryPowerDref);
 
                         com1ActiveFreq = String.valueOf(com1ActiveDrefResult[0]);
+                        com2ActiveFreq = String.valueOf(com2ActiveDrefResult[0]);
                         com1StandbyFreq = String.valueOf(com1StandbyDrefResult[0]);
+                        com2StandbyFreq = String.valueOf(com2StandbyDrefResult[0]);
                         com1LightState = String.valueOf(com1ListenDrefResult[0]);
+                        com2LightState = String.valueOf(com2ListenDrefResult[0]);
                         batteryState = String.valueOf(batteryPowerDrefResult[0]);
 
-                        com1ActiveFreq = com1ActiveFreq.replaceAll("\\[\\]", "");
-                        com1ActiveFreq = com1ActiveFreq.replaceAll("\\.", "");
-                        com1ActiveFreq = com1ActiveFreq.substring(0, 3) + "." + com1ActiveFreq.substring(3);
-                        
-                        com1StandbyFreq = com1StandbyFreq.replaceAll("\\[\\]", "");
-                        com1StandbyFreq = com1StandbyFreq.replaceAll("\\.", "");
-                        com1StandbyFreq = com1StandbyFreq.substring(0, 3) + "." + com1StandbyFreq.substring(3);
+                        com1ActiveFreq = GeneralClasses.trimFreqResult(com1ActiveFreq);
+                        com1StandbyFreq = GeneralClasses.trimFreqResult(com1StandbyFreq);
+                        com2ActiveFreq = GeneralClasses.trimFreqResult(com2ActiveFreq);
+                        com2StandbyFreq = GeneralClasses.trimFreqResult(com2StandbyFreq);
+
 
                         // Debug Statement
                         if (isDebugRunning) {
                             System.out.println("Debug: " + "Com1Active = " + com1ActiveFreq);
                             System.out.println("Debug: " + "Com1Standby = " + com1StandbyFreq);
                             System.out.println("Debug: " + "Com1Listen = " + com1ListenDrefResult[0]);
+                            System.out.println("Debug: " + "Com2Active = " + com2ActiveFreq);
+                            System.out.println("Debug: " + "Com2Standby = " + com2StandbyFreq);
+                            System.out.println("Debug: " + "Com2Listen = " + com2ListenDrefResult[0]);
                             System.out.println("Debug: " + "Battery Power = " + batteryState);
                         }
                         
+                        String com1CurrentFreq = com1ActiveFreq;
+                        
+                        
+                        
                         java.awt.EventQueue.invokeLater(() -> {
-                            setActiveRadioLabel(com1ActiveFreq);
-                            setStandbyRadioLabel(com1StandbyFreq);
+                            setcom1ActiveRadioLabel(com1ActiveFreq);
+                            setcom1StandbyRadioLabel(com1StandbyFreq);
+                            setcom2ActiveRadioLabel(com2ActiveFreq);
+                            setcom2StandbyRadioLabel(com2StandbyFreq);
                             
                             if (batteryState.matches("1.0")) {
                                 lbl_activeFreq.setVisible(true);
+                                lbl_activeFreq1.setVisible(true);
                                 lbl_standbyFreq.setVisible(true);
+                                lbl_standbyFreq1.setVisible(true);
                                 
                                 if (com1LightState.matches("1.0")) {
                                     vhf1_light.setVisible(true);
                                     
-                                    if (audioThread == null) {
+                                    if (audioThreadCom1 == null) {
                                         // Debug Statement
                                         if (isDebugRunning) {
                                             System.out.println("Debug: " + "Audio Thread is Null - Probably first boot.");
                                         }
-                                        audioThread = new AudioStream(currentStream);
-                                        audioThread.start();
+
+                                        audioThreadCom1 = new AudioStreamCom1(com1AudioStream);
+                                        audioThreadCom1.start();
 
                                     } else {
-                                        if (audioThread.isAlive()) {
+                                        if (audioThreadCom1.isAlive()) {
                                             // Debug Statement
                                             if (isDebugRunning) {
                                                 System.out.println("Debug: " + "Audio Thread is Alive - Can't start another thread!");
@@ -258,8 +298,9 @@ public class RealRadio extends javax.swing.JFrame {
                                             if (isDebugRunning) {
                                                 System.out.println("Debug: " + "Audio Thread not started");
                                             }
-                                            audioThread = new AudioStream(currentStream);
-                                            audioThread.start();
+
+                                            audioThreadCom1 = new AudioStreamCom1(com1AudioStream);
+                                            audioThreadCom1.start();
 
                                         }
                                     }
@@ -267,22 +308,36 @@ public class RealRadio extends javax.swing.JFrame {
                                 } else {
                                     vhf1_light.setVisible(false);
                                     
-                                    stopAudioStream();
+                                    stopAudioStreamCom1();
+                                }
+                                
+                                if (com2LightState.matches("1.0")) {
+                                    vhf2_light.setVisible(true);
+
+                                } else {
+                                    vhf2_light.setVisible(false);
+                                    
                                 }
                                 
                                 isBatteryOn = true;
 
                             } else {
                                 lbl_activeFreq.setVisible(false);
+                                lbl_activeFreq1.setVisible(false);
                                 lbl_standbyFreq.setVisible(false);
+                                lbl_standbyFreq1.setVisible(false);
                                 vhf1_light.setVisible(false);
                                 
                                 isBatteryOn = false;
-                                
-                                stopAudioStream();
+
+                                stopAudioStreamCom1();
                             }
                         });
-
+                        
+                        java.awt.EventQueue.invokeLater(() -> {
+                            setConnectionStatus("<html><font color='green'>Connected</font></html>");
+                        });
+                        
                         try {
                             Thread.sleep(refreshTime);
                         } catch (InterruptedException ex) {
@@ -293,8 +348,7 @@ public class RealRadio extends javax.swing.JFrame {
                             break;
                         }
                     }
-                }
-                catch(IOException ex) {
+                } catch(IOException ex) {
                     // Debug Statement
                     if (isDebugRunning) {
                         System.out.println("Debug: " + "Error:");
@@ -311,6 +365,27 @@ public class RealRadio extends javax.swing.JFrame {
                     } catch (InterruptedException ex1) {
                         
                     }
+                    
+                    lbl_activeFreq.setVisible(false);
+                    lbl_activeFreq1.setVisible(false);
+                    lbl_standbyFreq.setVisible(false);
+                    lbl_standbyFreq1.setVisible(false);
+                    vhf1_light.setVisible(false);
+                    vhf2_light.setVisible(false);
+                    
+                    setConnectionStatus("<html><font color='yellow'>Not Connected</font></html>");
+                    
+                    if (audioThreadCom1 == null) {
+                        // Debug Statement
+                        if (isDebugRunning) {
+                            System.out.println("Debug: " + "Audio Thread is Null and Doesn't need to be killed");
+                        }
+                    } else {
+                        if (audioThreadCom1.isAlive()) {
+                            stopAudioStreamCom1();
+                        }
+                    }
+
                     createListenerThread();
                 }
             }
@@ -344,10 +419,13 @@ public class RealRadio extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new RealRadio().setVisible(true);
-            
+            setConnectionStatus("<html><font color='yellow'>Not Connected</font></html>");
             lbl_activeFreq.setVisible(false);
+            lbl_activeFreq1.setVisible(false);
             lbl_standbyFreq.setVisible(false);
+            lbl_standbyFreq1.setVisible(false);
             vhf1_light.setVisible(false);
+            vhf2_light.setVisible(false);
             isBatteryOn = false;
         });
         
@@ -355,23 +433,39 @@ public class RealRadio extends javax.swing.JFrame {
 
     }
     
-    public static void setActiveRadioLabel(String text) {
+    public static void setcom1ActiveRadioLabel(String text) {
         lbl_activeFreq.setText(text);
     }
     
-    public static void setStandbyRadioLabel(String text) {
+    public static void setcom1StandbyRadioLabel(String text) {
         lbl_standbyFreq.setText(text);
+    }
+    
+    public static void setcom2ActiveRadioLabel(String text) {
+        lbl_activeFreq1.setText(text);
+    }
+    
+    private static void setcom2StandbyRadioLabel(String text) {
+        lbl_standbyFreq1.setText(text);
+    }
+    
+    public static void setConnectionStatus(String text) {
+        lbl_connectionStatus.setText(text);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel RealRadio;
     private javax.swing.JButton closeButton;
     private static javax.swing.JLabel lbl_activeFreq;
+    private static javax.swing.JLabel lbl_activeFreq1;
+    private static javax.swing.JLabel lbl_connectionStatus;
     private static javax.swing.JLabel lbl_standbyFreq;
+    private static javax.swing.JLabel lbl_standbyFreq1;
     private javax.swing.JButton minimizeButton;
     private javax.swing.JButton optionsButton;
     private javax.swing.JLabel realRadioLogo;
     private javax.swing.JLabel updaterBackground;
     private static javax.swing.JLabel vhf1_light;
+    private static javax.swing.JLabel vhf2_light;
     // End of variables declaration//GEN-END:variables
 }
