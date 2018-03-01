@@ -1,9 +1,3 @@
-    ____             __   ____            ___     
-   / __ \___  ____ _/ /  / __ \____ _____/ (_)___ 
-  / /_/ / _ \/ __ `/ /  / /_/ / __ `/ __  / / __ \
- / _, _/  __/ /_/ / /  / _, _/ /_/ / /_/ / / /_/ /
-/_/ |_|\___/\__,_/_/  /_/ |_|\__,_/\__,_/_/\____/ 
-
 This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 
 4.0 International License. To view a copy of this license, visit 
 http://creativecommons.org/licenses/by-nc-nd/4.0/ or send a letter to Creative Commons, 
