@@ -19,7 +19,7 @@ import javafx.stage.StageStyle;
 
 /**
  *
- * @author MPHI14
+ * @author Whiskeysim
  */
 public class Main extends Application {
     public static final boolean isDebugRunning = true;
