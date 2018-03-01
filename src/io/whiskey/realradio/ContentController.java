@@ -32,7 +32,7 @@ import org.ini4j.Ini;
 
 /**
  *
- * @author MPHI14
+ * @author Whiskeysim
  */
 public class ContentController implements Initializable {
     public static Ini iReadINI;
