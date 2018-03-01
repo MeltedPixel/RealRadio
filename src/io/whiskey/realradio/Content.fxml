@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane id="AnchorPane" prefHeight="198.0" prefWidth="404.0" styleClass="root" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.whiskey.realradio.ContentController">
+    <children>
+      <ImageView fitHeight="198.0" fitWidth="404.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/uiskin.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="vhf1_light" fitHeight="19.0" fitWidth="29.0" layoutX="105.0" layoutY="118.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/light.png" />
+         </image>
+      </ImageView>
+      <JFXButton fx:id="btn_vhf1" contentDisplay="GRAPHIC_ONLY" layoutX="102.0" layoutY="132.0" onAction="#btn_vhf1ActionPerformed" prefHeight="19.0" prefWidth="36.0" ripplerFill="#1e1e1e">
+         <font>
+            <Font size="1.0" />
+         </font>
+      </JFXButton>
+      <ImageView fx:id="vhf2_light" fitHeight="19.0" fitWidth="29.0" layoutX="157.0" layoutY="118.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/light.png" />
+         </image>
+      </ImageView>
+      <JFXButton fx:id="btn_vhf2" contentDisplay="GRAPHIC_ONLY" layoutX="153.0" layoutY="132.0" onAction="#btn_vhf2ActionPerformed" prefHeight="19.0" prefWidth="36.0" ripplerFill="#1e1e1e">
+         <font>
+            <Font size="1.0" />
+         </font>
+      </JFXButton>
+      <Pane layoutX="11.0" layoutY="1.0" prefHeight="25.0" prefWidth="384.0">
+         <children>
+            <ImageView fitHeight="19.0" fitWidth="18.0" layoutX="5.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/logo18px.png" />
+               </image>
+            </ImageView>
+            <JFXButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" layoutX="363.0" layoutY="2.0" onAction="#buttonActionClose" ripplerFill="#1e1e1e">
+               <font>
+                  <Font size="1.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/close.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" layoutX="340.0" layoutY="2.0" ripplerFill="#1e1e1e">
+               <font>
+                  <Font size="1.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/options.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" layoutX="317.0" layoutY="2.0" onAction="#buttonActionMinimize" ripplerFill="#1e1e1e">
+               <font>
+                  <Font size="1.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/minimize.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <Text fill="WHITE" layoutX="28.0" layoutY="17.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Real Radio">
+               <font>
+                  <Font name="BaskervilleT-Medi" size="17.0" />
+               </font>
+            </Text>
+            <StackPane layoutX="196.0" layoutY="2.0" prefHeight="19.0" prefWidth="119.0">
+               <children>
+                  <Label fx:id="lbl_connectionStatus" text="Not Connected" textFill="#fff600">
+                     <font>
+                        <Font name="Arial Bold" size="12.0" />
+                     </font>
+                  </Label>
+               </children>
+            </StackPane>
+         </children>
+      </Pane>
+      <StackPane layoutX="57.0" layoutY="61.0" prefHeight="27.0" prefWidth="112.0">
+         <children>
+            <Label fx:id="label_leftLCD" contentDisplay="CENTER" graphicTextGap="0.0" text="122.80" textFill="#cdcdcd">
+               <font>
+                  <Font name="Digital-7" size="34.0" />
+               </font>
+            </Label>
+         </children>
+      </StackPane>
+      <StackPane layoutX="237.0" layoutY="61.0" prefHeight="27.0" prefWidth="112.0">
+         <children>
+            <Label fx:id="label_rightLCD" contentDisplay="CENTER" graphicTextGap="0.0" text="122.80" textFill="#cdcdcd">
+               <font>
+                  <Font name="Digital-7" size="34.0" />
+               </font>
+            </Label>
+         </children>
+      </StackPane>
+    </children>
+</AnchorPane>
